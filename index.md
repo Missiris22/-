@@ -1,0 +1,361 @@
+​         
+
+## 表格配置多种情况 rules
+
+```js
+// 处理方式：form的rules放到computed
+computed: {
+  	rules() {
+      	const rules = {
+          	skuId: [ { required: true, message: '请输入商品skuId', trigger: 'blur' } ],
+          	outStock: [ { required: true, message: '请填写出库库存' } ],
+          	usage: [ { required: true, message: '请选择用途' } ],
+          	receiver: [ { required: true, message: '请输入收货人' } ],
+          	address: [ { required: true, message: '请输入收货地址' } ], 
+          	tel: [ { required: true, message: '请输入联系电话' } ]
+        };
+      	if (this.ruleForm.usage === '内部领用') {
+          	// 将rules复制到前面的对象中，并且返回
+          	return Object.assign({
+              	deptCode: [ { required: true, message: '请填写申领部门信息' } ]
+            }, rules);
+        } 
+      	// 未选择【内部领用】的时候
+      	return rules;
+    }
+}
+```
+
+
+
+## Vue 中实现双向绑定的 4 种方法
+
+【掘金】https://juejin.im/post/6844903576540545031
+
+v-model
+
+.sync ￼
+
+model属性（jsx/渲染函数中）
+
+这部分在jsx中的具体使用，可以参考【Element-ui自定义table表头，修改列标题样式、添加tooltip， :render-header使用简介】https://blog.csdn.net/pinbolei/article/details/83991399 
+
+vue-better-sync 插件 https://github.com/fjc0k/vue-better-sync
+
+
+
+## 手动写一个图片上传组件
+
+```js
+// 图片显示部分// 遍历 图片数组 展示
+<div class="refund-image" v-for="(item, index) in imageList" :key="index"> 
+  // 弹出框：trigger="hover"触摸显示；placement="right-start"位于组件右侧
+  <el-popover placement="right-start" width="600" trigger="hover"> 
+    // 触摸显示部分 
+    < img style="width:600px" :src="item"/> 
+      // 使用 slot="reference" 的具名插槽指向 Popover 的索引ref
+      <div slot="reference" class="pic-box"> 
+        // 删除按钮 
+        <i @click="removePicture(index)" class="el-icon-delete picture-delete" ></i>
+// 小图 展示 
+< img :src="item" width="80px" height="80px"/> </div> </el-popover></div>
+// 增加图片按钮部分
+<div v-show="imageList.length < 10" class="avatar-uploader pictrue-ct" @click="showImgBox"> // 表层显示的加号 
+  <i class="el-icon-plus avatar-uploader-icon"></i> 
+// 背后隐藏的上传按钮 
+<input style="visibility: hidden" type="file" accept=".jpg, .png" ref="img" @change="uploadImg" data-test="upload-img-input" /></div>
+// js
+// 点击增加按钮组件实际触发上传组件，click img触发input change 事件
+showImgBox() { 
+  this.$refs.img.click();
+}
+uploadImg(event) { 
+  const imgFile = event.target.files[0]; 
+  if (imgFile.type !== 'image/jpeg' && imgFile.type !== 'image/png') {	this.$message.error('仅支持jpg和png格式'); return; } 
+  const reader = new FileReader(); reader.readAsDataURL(imgFile); 
+  reader.onload = e => {
+    const data = e.target.result;
+    const image = new Image();
+    image.onload = () => {
+      const formData = new FormData();
+      formData.append('file', imgFile);
+      fetch(this.imageUpload, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      }).then(response => response.json())
+        .then(response => {
+        	if (response.code === 0) {
+            this.$set(this.imageList, this.imageList.length, response.data);
+          }
+        	else { this.$message.error('图片上传失败'); } }); };
+    image.src = data;
+  };
+}, 
+ // css
+  .avatar-uploader {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    width: 80px; 
+   	height: 80px;
+    display: inline-block;
+  }
+.avatar-uploader:hover { 
+  border-color: #409eff;
+}
+.avatar-uploader-icon { 
+  font-size: 28px; 
+  color: #8c939d; 
+  width: 80px; 
+  height: 80px; 
+  line-height: 80px; 
+  text-align: center;
+} 
+```
+
+
+
+## js实现页面跳转
+
+https://juejin.im/post/6844903925741682696
+
+1. window.location.href="www.baidu.com"
+2. window.location.assign("www.baidu.com")
+3. window.location.replace("www.baidu.com") // 跳转后不会保存跳出页面的信息，无history记录 
+
+**历史页跳转**
+
+```js
+window.history.back();
+window.history.back(-2);
+window.history.go(-1);
+window.history.go('../routes/admin/');
+```
+
+**重新加载本页**
+
+```js
+widnow.location.reload();
+window.location.replace();
+window.location.replace("http://www.baidu.com") 
+```
+
+
+
+## 根据选择修改日期
+
+```html
+<el-form-item label="提交时间">
+  <el-date-picker
+      v-model="timePickerValue"
+      type="datetimerange"
+      value-format="timestamp"
+      start-placeholder="开始日期"
+      end-placeholder="结束日期"
+  />
+  <el-button size="small" @click="changeDate(0)" class="today_btn">今天</el-button> 
+ 	<el-button size="small" @click="changeDate(-1)">昨天</el-button>
+  <el-button size="small" @click="changeDate(7)">最近7天</el-button>
+  <el-button size="small" @click="changeDate(30)">最近30天</el-button>
+</el-form-item> 
+```
+
+```JS
+changeDate(time) {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayStartTimestamp = todayStart.getTime();
+  const now = Date.now();
+  const oneday = 24 * 60 * 60000;
+  switch (time) {
+    case -1: {
+      this.timePickerValue = [todayStartTimestamp - oneday, todayStartTimestamp - 1];
+      break;
+    }
+    case 0: {
+      this.timePickerValue = [todayStartTimestamp, now];
+      break;                                                                                                       		 }
+    case 7: {
+      this.timePickerValue = [now - oneday * 7, now - 1]; // 一周前的此刻 至 此刻前一毫秒
+      break; 
+    } 
+    case 30: { 
+      this.timePickerValue = [now - oneday * 30, now - 1]; // 一周前的此刻 至 此刻前一毫秒 
+      break; 
+    } 
+    default: 
+      break; 
+  }
+}
+```
+
+
+
+## 动态class
+
+```html
+<h3 :class="['status',...statusClassName.mainClassName]">
+  <i :class="statusClassName.iconClassName"></i>
+  <span v-if="barterInfo.checkStatus === 0">待审核</span> 
+  <span v-if="barterInfo.checkStatus === 1"> 
+    审核通过 —— {{barterStatusList[barterInfo.barterStatus - 1]}} 
+  </span> 
+  <span v-if="barterInfo.checkStatus === 2">审核驳回</span></h3> 
+```
+
+```js
+computed: {
+  statusClassName() { 
+    const barterInfo = this.barterInfo; 
+    return { 
+      mainClassName: [ 
+        { pass: barterInfo.checkStatus === 1 && barterInfo.barterStatus < 7 }, 
+        { reject: barterInfo.checkStatus === 2 || barterInfo.barterStatus === 7 } ], 
+      iconClassName: [ 
+        { 'el-icon-warning': barterInfo.checkStatus === 0 }, 
+        { 'el-icon-success': barterInfo.checkStatus === 1}, 
+        { 'el-icon-error': barterInfo.checkStatus === 2}, 
+        { 'el-icon-info': barterInfo.checkStatus === 3}
+      ] 
+    }; 
+  }
+} 
+```
+
+
+
+## element $confirm 交换确认和取消按钮的位置
+
+```js
+this.$confirm('确认后此服务协议将发布生效，是否确认该操作？', '提示', { 
+  confirmButtonText: '确定', 
+  cancelButtonText: '取消',
+  confirmButtonClass: 'btn-custom-confirm',
+  cancelButtonClass: 'btn-custom-cancel', 
+  type: 'warning'
+}).then(() => { 
+  this.$message.success('success');
+}).catch(() => { 
+  this.$message({ type: 'info', message: '已取消删除' });
+});
+```
+
+```css
+// 无效时尝试全局
+.btn-custom-cancel { 
+  float: right; 
+  margin-right: 20px;
+}
+.el-button.el-button--default.el-button--small.btn-custom-confirm {
+  float: right; 
+  margin-right: 20px;
+}
+```
+
+
+
+## el-select 绑定对象
+
+> select绑定对象的两个方法
+>
+> 方法1：el-option 的 change 事件可以获得选中的整个对象
+>
+> 方法2：el-select 直接绑定对象
+>
+> **el-option中传入的value值为对象**
+
+```html
+<el-select
+    v-model="accountInfo"
+    placeholder="请输入UID/AD账号"
+    filterable
+    remote
+    :remote-method="getUidDetail"
+    :loading="loading"
+    value-key="accountText"
+>
+		<el-option
+        v-for="item in options"
+        :key="item.accountId"
+        :label="item.accountText"
+        :value="item"
+    />
+</el-select>
+```
+
+```js
+// 1. value-key select绑定对象的时候传入，作为唯一标示
+// 2. option中传入的value为整个对象，在 computed 中处理 select 保存的数据
+// 3. remote & remote-method 远程获取选项，remote-method
+
+computed: {
+  	accountInfo: {
+        set({ accountText, accountId }) {
+            this.addParams.accountText = accountText;
+            this.addParams.accountId = accountId;
+        },
+        get() {
+            const { accountText, accountId } = this.addParams;
+            return { accountText, accountId };
+        }
+    },
+},
+getUidDetail(val) {
+    if (val === '') {
+        this.options = [];
+        return;
+    }
+    this.loading = true;
+    services.searchAdAccount({ adAccount: val }).then(data => {
+        this.loading = false;
+        this.options = data.map(item => ({
+            ...item,
+            accountText: item.text,
+            accountId: item.id
+        }));
+    }).catch(err => {
+      	this.$message.error(err);
+    });
+}
+```
+
+
+
+## watch
+
+```js
+watch: {
+  	isLoading(newVal, oldVal) {}, // 简单监听
+    // 深度监听对象
+   	newObj: {
+      	handler(newVal, oldVal) {},
+        deep: true
+    },
+    // 监听对象属性
+    'newObj.name': function(newVal, oldVal) {}
+}
+```
+
+
+
+**另一种方法配合 computed 监听对象属性**
+
+将对象属性转成新的变量
+
+```js
+computed: {
+  	name() {
+      	return newObj.name;
+    }
+},
+watch: {
+  	name(newVal, oldVal) {}
+}
+```
+
+
+
+
