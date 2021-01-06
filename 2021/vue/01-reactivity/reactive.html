@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        .cell {
+            border: 1px solid #ccc;
+            height: 20px;
+            min-width: 100px;
+            display: inline-block;
+            background-color: pink;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tbody>
+            <tr>
+                <th>
+                    <input class="cell a1"></input>
+                </th>
+                <th>
+                    <span class="cell b1">0</span>
+                </th>
+            </tr>
+        </tbody>
+    </table>
+    <button onClick="clickBtn()">按钮</button>
+</body>
+<script>
+const input = document.querySelector('.cell.a1')
+input.addEventListener('input', clickBtn)
+function clickBtn() {
+    const a1 = document.querySelector('.cell.a1').value;
+    document.querySelector('.cell.b1').textContent = a1 * 10;
+}
+</script>
+</html>
