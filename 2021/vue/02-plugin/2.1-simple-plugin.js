@@ -1,7 +1,8 @@
-import Vue from 'vue'
+// import Vue from '../../../node_modules/vue/dist/vue.min.js'
+const Vue = require('../../../node_modules/vue/dist/vue.min.js')
 
 const RulesPlugin = {
-    install (Vue) {
+    install () {
         Vue.mixin({
             created() {
                 if (this.$options.rules) {
@@ -20,12 +21,13 @@ const RulesPlugin = {
         })
     }
 }
+Vue.use(RulesPlugin);
 
 const vm = new Vue({
     data: {
-        foo: 10
+        foo: 1
     },
-    rulus: {
+    rules: {
         foo: {
             validate: value => value > 1,
             message: 'foo should be greater than one!'
@@ -34,4 +36,3 @@ const vm = new Vue({
 })
 
 vm.foo = 0
-RulesPlugin.install()
