@@ -25,7 +25,7 @@ Expected usage:
 // method3: put mixin inside a plugin
 // this install funcition will be invoked when we use Vue.use(RulesPlugin)
 const myPlugin = {
-    install(Vue) {
+    install() {
         Vue.mixin = {
             created() {
                 if (this.$options.rules) {
@@ -45,6 +45,7 @@ const myPlugin = {
     }
 }
 
+Vue.use(myPlugin)
 
 const vm = new Vue({
     data: { foo: 10 },
