@@ -257,3 +257,15 @@ export default (number1, number2, operator) => {
     return operator === '/' ? sum : Math.round(sum.toFixed(4)) / multiple;
 };
 ```
+
+## 由于key引发的血案
+
+出现情况：
+
+1. 根据不同的业务方，下拉多选内容查询显示不同。实际情况，list变化，但组件展示内容不更新。
+2. 根据【el-table】列信息判断显示某元素（通过计算属性`isShow`控制）。实际情况，变量变化，但组件元素不展示 / 隐藏。
+
+解决方案：
+
+1. 给下拉框组件添加key属性，每次渲染的key不同，触发组件重新刷新
+2. 给该【el-table-column】添加key属性，关联变量监听每次`isShow`变化，自增。由于key不同，触发列的重新渲染
