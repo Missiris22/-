@@ -1091,7 +1091,7 @@ https://alexjover.com/blog/test-computed-properties-and-watchers-in-vue-js-compo
 >
 > [jest 模拟更改 测试 FileReader onload] https://stackoverflow.com/questions/61572070/how-to-test-filereader-onload-using-simulate-change-in-jest
 >
-> 
+
 
 
 
@@ -1114,7 +1114,17 @@ https://alexjover.com/blog/test-computed-properties-and-watchers-in-vue-js-compo
 
 
 
+**解决jest的”too many open files, watch”问题(Mac OSX) ** 
+https://blog.k-res.net/archives/2529.html
 
+> 由于Mac OSX对于打开文件数的限制所导致的
+> 解决：在命令行中通过brew安装一个叫watchman的东西
+
+
+```
+$ brew update
+$ brew install watchman
+```
 
 
 
@@ -1125,13 +1135,7 @@ https://alexjover.com/blog/test-computed-properties-and-watchers-in-vue-js-compo
 
 
 
-
-
-
-
-
-
-2. 巨多类似报错，是因为在mount的时候还没有渲染内部组件，所以出现报错。
+巨多类似报错，是因为在mount的时候还没有渲染内部组件，所以出现报错。
 
    出错源头：未定（有博客说是因为elementui中select组件的原因）
 
